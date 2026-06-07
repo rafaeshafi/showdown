@@ -1,10 +1,6 @@
 {
   "crons": [
-    { "path": "/api/cron/sync-matches", "schedule": "0 */3 * * *" },
-    { "path": "/api/cron/sync-odds", "schedule": "0 */4 * * *" },
     { "path": "/api/cron/generate-previews", "schedule": "0 6 * * *" },
-    { "path": "/api/cron/generate-recaps", "schedule": "*/30 * * * *" },
-    { "path": "/api/cron/post-to-x", "schedule": "0 */2 * * *" },
-    { "path": "/api/cron/post-to-reddit", "schedule": "0 8 * * *" }
+    { "path": "/api/cron/generate-recaps", "schedule": "0 22 * * *" }
   ]
 }

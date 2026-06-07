@@ -1,0 +1,46 @@
+name: Cron Jobs
+
+on:
+  schedule:
+    - cron: '0 */3 * * *'   # sync-matches every 3h
+    - cron: '0 */4 * * *'   # sync-odds every 4h
+    - cron: '0 */2 * * *'   # post-to-x every 2h
+    - cron: '0 8 * * *'     # post-to-reddit daily 8am
+  workflow_dispatch:          # manual trigger
+
+jobs:
+  sync-matches:
+    if: github.event.schedule == '0 */3 * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger sync-matches
+        run: |
+          curl -sf -X GET "${{ secrets.SITE_URL }}/api/cron/sync-matches" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
+
+  sync-odds:
+    if: github.event.schedule == '0 */4 * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger sync-odds
+        run: |
+          curl -sf -X GET "${{ secrets.SITE_URL }}/api/cron/sync-odds" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
+
+  post-to-x:
+    if: github.event.schedule == '0 */2 * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger post-to-x
+        run: |
+          curl -sf -X GET "${{ secrets.SITE_URL }}/api/cron/post-to-x" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
+
+  post-to-reddit:
+    if: github.event.schedule == '0 8 * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger post-to-reddit
+        run: |
+          curl -sf -X GET "${{ secrets.SITE_URL }}/api/cron/post-to-reddit" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
