@@ -6,12 +6,15 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed:matches": "npx ts-node --project tsconfig.json scripts/seed-matches.ts",
+    "seed:countries": "npx ts-node --project tsconfig.json scripts/seed-country-pages.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.102.0",
     "@supabase/supabase-js": "^2.107.0",
     "date-fns": "^4.4.0",
+    "dotenv": "^17.4.2",
     "marked": "^18.0.5",
     "next": "16.2.7",
     "react": "19.2.4",
@@ -19,6 +22,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/dotenv-flow": "^3.3.3",
     "@types/marked": "^5.0.2",
     "@types/node": "^20.19.42",
     "@types/react": "^19",
@@ -26,6 +30,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.7",
     "tailwindcss": "^4",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }
