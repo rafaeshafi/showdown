@@ -14,6 +14,7 @@ async function main() {
   const { matches } = await res.json()
 
   for (const m of matches) {
+    if (!m.homeTeam?.name || !m.awayTeam?.name) continue
     const d = m.utcDate.split('T')[0]
     const h = m.homeTeam.name.toLowerCase().replace(/\s+/g, '-')
     const a = m.awayTeam.name.toLowerCase().replace(/\s+/g, '-')

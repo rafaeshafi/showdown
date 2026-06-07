@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "seed:matches": "npx ts-node --project tsconfig.json scripts/seed-matches.ts",
-    "seed:countries": "npx ts-node --project tsconfig.json scripts/seed-country-pages.ts"
+    "seed:matches": "NODE_OPTIONS=--experimental-websocket npx tsx scripts/seed-matches.ts",
+    "seed:countries": "NODE_OPTIONS=--experimental-websocket npx tsx scripts/seed-country-pages.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.102.0",

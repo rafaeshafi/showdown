@@ -1,7 +1,11 @@
 import Anthropic from '@anthropic-ai/sdk'
 import type { Match, OddsSnapshot } from '@/types'
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+let _client: Anthropic | null = null
+function client(): Anthropic {
+  if (!_client) _client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+  return _client
+}
 
 export async function generatePreview(match: Match, odds: OddsSnapshot[]): Promise<{ title: string; body_md: string; meta_description: string }> {
   const oddsText = odds.length > 0
@@ -10,7 +14,7 @@ export async function generatePreview(match: Match, odds: OddsSnapshot[]): Promi
 
   const kickoff = new Date(match.kickoff_time).toUTCString()
 
-  const msg = await client.messages.create({
+  const msg = await client().messages.create({
     model: 'claude-haiku-4-5-20251001',
     max_tokens: 800,
     messages: [{
@@ -38,7 +42,7 @@ Tone: sharp, confident sports journalism. No fluff.`,
 export async function generateRecap(match: Match): Promise<{ title: string; body_md: string; meta_description: string }> {
   const score = `${match.home_score}–${match.away_score}`
 
-  const msg = await client.messages.create({
+  const msg = await client().messages.create({
     model: 'claude-haiku-4-5-20251001',
     max_tokens: 600,
     messages: [{
@@ -61,7 +65,7 @@ Tone: sharp post-match reporting. Keep it factual and punchy.`,
 }
 
 export async function generateCountryGuide(country: string, broadcaster: string, free: boolean, vpnNote: string): Promise<{ title: string; body_md: string; meta_description: string }> {
-  const msg = await client.messages.create({
+  const msg = await client().messages.create({
     model: 'claude-haiku-4-5-20251001',
     max_tokens: 700,
     messages: [{
