@@ -2,28 +2,27 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import Link from 'next/link'
-import Script from 'next/script'
 
 const inter = Inter({ subsets: ['latin'] })
+
+const adClient = process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID
 
 export const metadata: Metadata = {
   title: 'Showdown — World Cup 2026 Predictions, Odds & Streaming Guides',
   metadataBase: new URL('https://showdown.vercel.app'),
   description: 'World Cup 2026 match previews, live odds from every sportsbook, and guides to watch every game free from anywhere.',
+  ...(adClient && { other: { 'google-adsense-account': adClient } }),
 }
-
-const adClient = process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
         {adClient && (
-          <Script
+          <script
             async
             src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adClient}`}
             crossOrigin="anonymous"
-            strategy="afterInteractive"
           />
         )}
       </head>
