@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Showdown — World Cup 2026 Predictions, Odds & Streaming Guides',
-  metadataBase: new URL('https://kickoff-picks.vercel.app'),
+  metadataBase: new URL('https://showdown.vercel.app'),
   description: 'World Cup 2026 match previews, live odds from every sportsbook, and guides to watch every game free from anywhere.',
 }
 
