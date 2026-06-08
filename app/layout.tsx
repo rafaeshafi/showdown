@@ -11,13 +11,13 @@ export const metadata: Metadata = {
   title: 'Showdown — World Cup 2026 Predictions, Odds & Streaming Guides',
   metadataBase: new URL('https://showdown.vercel.app'),
   description: 'World Cup 2026 match previews, live odds from every sportsbook, and guides to watch every game free from anywhere.',
-  ...(adClient && { other: { 'google-adsense-account': adClient } }),
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
+        <meta name="google-adsense-account" content="ca-pub-6004755636683447" />
         {adClient && (
           <script
             async
