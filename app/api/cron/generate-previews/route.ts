@@ -16,7 +16,7 @@ export async function GET(req: Request) {
   const { data: matches } = await supabaseAdmin
     .from('matches')
     .select('*')
-    .eq('status', 'SCHEDULED')
+    .in('status', ['SCHEDULED', 'TIMED'])
     .gte('kickoff_time', start)
     .lte('kickoff_time', end)
     .returns<Match[]>()

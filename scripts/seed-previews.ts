@@ -1,4 +1,5 @@
-import 'dotenv/config'
+import * as dotenv from 'dotenv'
+dotenv.config({ path: '.env.local' })
 import { createClient } from '@supabase/supabase-js'
 import Anthropic from '@anthropic-ai/sdk'
 import type { Match, OddsSnapshot } from '../types'
@@ -43,7 +44,7 @@ async function main() {
   const { data: matches } = await supabase
     .from('matches')
     .select('*')
-    .eq('status', 'SCHEDULED')
+    .in('status', ['SCHEDULED', 'TIMED'])
     .gte('kickoff_time', new Date().toISOString())
     .lte('kickoff_time', lookahead.toISOString())
     .returns<Match[]>()
