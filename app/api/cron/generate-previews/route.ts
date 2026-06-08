@@ -8,10 +8,10 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const tomorrow = new Date()
-  tomorrow.setDate(tomorrow.getDate() + 1)
+  const lookahead = new Date()
+  lookahead.setDate(lookahead.getDate() + 7)
   const start = new Date().toISOString()
-  const end = tomorrow.toISOString()
+  const end = lookahead.toISOString()
 
   const { data: matches } = await supabaseAdmin
     .from('matches')
