@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import Script from 'next/script'
 import './globals.css'
 import Link from 'next/link'
 
@@ -11,22 +12,23 @@ export const metadata: Metadata = {
   title: 'Showdown — World Cup 2026 Predictions, Odds & Streaming Guides',
   metadataBase: new URL('https://showdown.vercel.app'),
   description: 'World Cup 2026 match previews, live odds from every sportsbook, and guides to watch every game free from anywhere.',
+  other: {
+    'google-adsense-account': 'ca-pub-6004755636683447',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <head>
-        <meta name="google-adsense-account" content="ca-pub-6004755636683447" />
+      <body className={`${inter.className} bg-gray-950 text-gray-100 min-h-screen`}>
         {adClient && (
-          <script
+          <Script
             async
             src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adClient}`}
             crossOrigin="anonymous"
+            strategy="afterInteractive"
           />
         )}
-      </head>
-      <body className={`${inter.className} bg-gray-950 text-gray-100 min-h-screen`}>
         <nav className="border-b border-gray-800 px-4 py-3">
           <div className="max-w-2xl mx-auto flex items-center gap-6">
             <Link href="/" className="text-white font-bold text-lg">⚽ Showdown</Link>
