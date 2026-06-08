@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "seed:matches": "NODE_OPTIONS=--experimental-websocket npx tsx scripts/seed-matches.ts",
-    "seed:countries": "NODE_OPTIONS=--experimental-websocket npx tsx scripts/seed-country-pages.ts"
+    "seed:countries": "NODE_OPTIONS=--experimental-websocket npx tsx scripts/seed-country-pages.ts",
+    "seed:previews": "NODE_OPTIONS=--experimental-websocket npx tsx scripts/seed-previews.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.102.0",
