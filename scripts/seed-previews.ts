@@ -12,7 +12,7 @@ const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
 
 async function generatePreview(match: Match, odds: OddsSnapshot[]) {
   const oddsText = odds.length
-    ? `Home win: ${odds[0].home_win ?? '?'}, Draw: ${odds[0].draw ?? '?'}, Away win: ${odds[0].away_win ?? '?'}`
+    ? `Home win: ${odds[0].home_price ?? '?'}, Draw: ${odds[0].draw_price ?? '?'}, Away win: ${odds[0].away_price ?? '?'}`
     : 'Odds not yet available'
 
   const msg = await anthropic.messages.create({
