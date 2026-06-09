@@ -8,36 +8,53 @@ jobs:
   alias:
     runs-on: ubuntu-latest
     steps:
-      - name: Wait for Vercel deployment to be READY
+      - name: Wait for this commit's Vercel deployment to be READY, then alias
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          COMMIT_SHA: ${{ github.sha }}
         run: |
-          for i in $(seq 1 20); do
-            STATE=$(curl -sf \
-              "https://api.vercel.com/v6/deployments?projectId=prj_OddbXeQUVyQneRMYkcw62rhq46M2&limit=1&target=production" \
+          echo "Waiting for deployment of commit $COMMIT_SHA"
+          sleep 20  # give Vercel time to queue the deployment
+
+          for i in $(seq 1 24); do
+            RESULT=$(curl -sf \
+              "https://api.vercel.com/v6/deployments?projectId=prj_OddbXeQUVyQneRMYkcw62rhq46M2&limit=10" \
               -H "Authorization: Bearer $VERCEL_TOKEN" \
-              | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['deployments'][0]['readyState'])" 2>/dev/null)
-            echo "Attempt $i: state=$STATE"
-            [ "$STATE" = "READY" ] && break
+              | python3 -c "
+import sys, json
+data = json.load(sys.stdin)
+for d in data['deployments']:
+    if d.get('meta', {}).get('githubCommitSha', '').startswith('$COMMIT_SHA'[:12]) or d.get('meta', {}).get('githubCommitSha') == '$COMMIT_SHA':
+        print(d['readyState'] + ':' + d['uid'])
+        break
+else:
+    print('not_found:')
+" 2>/dev/null)
+
+            STATE=$(echo "$RESULT" | cut -d: -f1)
+            UID=$(echo "$RESULT" | cut -d: -f2)
+            echo "Attempt $i: state=$STATE uid=$UID"
+
+            if [ "$STATE" = "READY" ] && [ -n "$UID" ]; then
+              curl -sf -X POST \
+                "https://api.vercel.com/v2/aliases" \
+                -H "Authorization: Bearer $VERCEL_TOKEN" \
+                -H "Content-Type: application/json" \
+                -d "{\"alias\":\"showdown.vercel.app\",\"deploymentId\":\"$UID\"}"
+              echo "✅ showdown.vercel.app → $UID"
+              exit 0
+            fi
+
+            [ "$STATE" = "ERROR" ] && { echo "Deployment failed"; exit 1; }
             sleep 15
           done
-          [ "$STATE" = "READY" ] || { echo "Timed out waiting for deployment"; exit 1; }
-
-      - name: Point showdown.vercel.app to latest deployment
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        run: |
-          DEPLOY_UID=$(curl -sf \
+          echo "Timed out — aliasing to latest READY deployment instead"
+          FALLBACK=$(curl -sf \
             "https://api.vercel.com/v6/deployments?projectId=prj_OddbXeQUVyQneRMYkcw62rhq46M2&limit=1&target=production" \
             -H "Authorization: Bearer $VERCEL_TOKEN" \
             | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['deployments'][0]['uid'])")
-
-          echo "Aliasing $DEPLOY_UID → showdown.vercel.app"
-
-          curl -sf -X POST \
-            "https://api.vercel.com/v2/aliases" \
+          curl -sf -X POST "https://api.vercel.com/v2/aliases" \
             -H "Authorization: Bearer $VERCEL_TOKEN" \
             -H "Content-Type: application/json" \
-            -d "{\"alias\":\"showdown.vercel.app\",\"deploymentId\":\"$DEPLOY_UID\"}"
-
-          echo "✅ showdown.vercel.app updated"
+            -d "{\"alias\":\"showdown.vercel.app\",\"deploymentId\":\"$FALLBACK\"}"
+          echo "✅ Fallback alias applied"
