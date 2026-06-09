@@ -24,10 +24,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
 
-  // Match pages (published content)
+  // Match pages (published previews only)
   const { data: content } = await supabase
     .from('content')
     .select('slug, published_at')
+    .eq('type', 'preview')
     .not('published_at', 'is', null)
     .order('published_at', { ascending: false })
 
