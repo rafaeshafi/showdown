@@ -62,6 +62,16 @@ jobs:
               deploy_uid = data["deployments"][0]["uid"]
 
           print(f"Aliasing {deploy_uid} → {alias}")
-          result = api("/v2/aliases", method="POST", body={"alias": alias, "deploymentId": deploy_uid})
-          print(f"Done: {result.get('alias', result)}")
+          # Use the Vercel CLI via npx — more reliable than REST API for aliases
+          import subprocess
+          r = subprocess.run(
+              ["npx", "vercel@latest", "alias", "set", deploy_uid, alias,
+               "--token", token, "--yes"],
+              capture_output=True, text=True
+          )
+          print(r.stdout)
+          if r.returncode != 0:
+              print(r.stderr)
+              raise SystemExit(f"Alias failed: exit {r.returncode}")
+          print("✅ Done")
           PYEOF
