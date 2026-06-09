@@ -1,0 +1,34 @@
+name: Alias showdown.vercel.app
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  alias:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for Vercel deployment
+        run: sleep 45
+
+      - name: Get latest production deployment URL
+        id: deploy
+        run: |
+          DEPLOY_URL=$(curl -sf \
+            "https://api.vercel.com/v6/deployments?projectId=prj_OddbXeQUVyQneRMYkcw62rhq46M2&teamId=rafae-shafi-s-projects&limit=1&target=production" \
+            -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
+            | jq -r '.deployments[0].url')
+          echo "url=$DEPLOY_URL" >> $GITHUB_OUTPUT
+          echo "Latest deployment: $DEPLOY_URL"
+
+      - name: Re-alias showdown.vercel.app
+        run: |
+          curl -sf -X POST \
+            "https://api.vercel.com/v2/aliases" \
+            -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"alias\": \"showdown.vercel.app\", \"deploymentId\": \"$(curl -sf \
+              'https://api.vercel.com/v6/deployments?projectId=prj_OddbXeQUVyQneRMYkcw62rhq46M2&teamId=rafae-shafi-s-projects&limit=1&target=production' \
+              -H 'Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}' \
+              | jq -r '.deployments[0].uid')\"}"
+          echo "✅ showdown.vercel.app updated"

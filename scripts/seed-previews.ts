@@ -1,45 +1,18 @@
 import * as dotenv from 'dotenv'
 dotenv.config({ path: '.env.local' })
 import { createClient } from '@supabase/supabase-js'
-import Anthropic from '@anthropic-ai/sdk'
+import { generatePreview } from '../lib/content-generator'
 import type { Match, OddsSnapshot } from '../types'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
-
-async function generatePreview(match: Match, odds: OddsSnapshot[]) {
-  const oddsText = odds.length
-    ? `Home win: ${odds[0].home_price ?? '?'}, Draw: ${odds[0].draw_price ?? '?'}, Away win: ${odds[0].away_price ?? '?'}`
-    : 'Odds not yet available'
-
-  const msg = await anthropic.messages.create({
-    model: 'claude-haiku-4-5-20251001',
-    max_tokens: 1024,
-    messages: [
-      {
-        role: 'user',
-        content: `Write a 300-word World Cup 2026 match preview for ${match.home_team} vs ${match.away_team} on ${match.kickoff_time?.split('T')[0]}.
-Odds: ${oddsText}
-Group: ${match.group ?? 'TBD'}
-
-Return JSON exactly like:
-{"title": "...", "body": "...", "meta_description": "..."}`,
-      },
-    ],
-  })
-
-  const text = (msg.content[0] as { type: string; text: string }).text
-  const jsonMatch = text.match(/\{[\s\S]*\}/)
-  if (!jsonMatch) throw new Error('No JSON in response')
-  return JSON.parse(jsonMatch[0]) as { title: string; body: string; meta_description: string }
-}
 
 async function main() {
+  // Seed previews for entire remaining group stage (through June 27)
   const lookahead = new Date()
-  lookahead.setDate(lookahead.getDate() + 7)
+  lookahead.setDate(lookahead.getDate() + 21)
 
   const { data: matches } = await supabase
     .from('matches')
@@ -47,10 +20,11 @@ async function main() {
     .in('status', ['SCHEDULED', 'TIMED'])
     .gte('kickoff_time', new Date().toISOString())
     .lte('kickoff_time', lookahead.toISOString())
+    .order('kickoff_time', { ascending: true })
     .returns<Match[]>()
 
   if (!matches?.length) {
-    console.log('No upcoming matches in next 7 days')
+    console.log('No upcoming matches in lookahead window')
     return
   }
 
@@ -80,13 +54,16 @@ async function main() {
 
     try {
       const content = await generatePreview(match, odds ?? [])
-      await supabase.from('content').insert({
+      const { error } = await supabase.from('content').insert({
         match_id: match.id,
         type: 'preview',
         slug: match.slug,
-        ...content,
+        title: content.title,
+        body_md: content.body_md,
+        meta_description: content.meta_description,
         published_at: new Date().toISOString(),
       })
+      if (error) throw new Error(error.message)
       console.log(`✓ ${match.slug}`)
       generated++
     } catch (e) {
