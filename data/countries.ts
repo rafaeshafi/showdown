@@ -168,7 +168,7 @@ export const COUNTRIES_LIST = [
   'hungary', 'india', 'indonesia', 'iran', 'iraq', 'ireland', 'israel',
   'italy', 'jamaica', 'japan', 'jordan', 'kenya', 'malaysia', 'mexico',
   'morocco', 'netherlands', 'new-zealand', 'nigeria', 'norway', 'pakistan',
-  'panama', 'peru', 'philippines', 'poland', 'portugal', 'romania', 'russia',
+  'panama', 'peru', 'philippines', 'poland', 'portugal', 'romania',
   'saudi-arabia', 'scotland', 'senegal', 'serbia', 'singapore', 'south-africa',
   'south-korea', 'spain', 'sweden', 'switzerland', 'thailand', 'turkey',
   'ukraine', 'united-arab-emirates', 'united-kingdom', 'united-states',
